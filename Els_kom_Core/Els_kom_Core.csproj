@@ -81,6 +81,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Blowfish.cs" />
     <Compile Include="Classes\ExecutionManager.cs" />
     <Compile Include="Classes\INIObject.cs" />
     <Compile Include="Classes\KOMManager.cs" />
