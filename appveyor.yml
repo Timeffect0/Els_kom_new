@@ -10,8 +10,8 @@ platform: x86
 #- nuget install secure-file -ExcludeVersion
 #- secure-file\tools\secure-file -decrypt ./Tools/private_encryption.py.enc -secret %SECRET_KEY% -out ./Tools/private_encryption.py
 #- secure-file\tools\secure-file -decrypt ./PC/encryption_private.h.enc -secret %SECRET_KEY% -out ./PC/encryption_private.h
-before_build:
-- cmd: call ci_build.bat
+#before_build:
+#- cmd: call ci_build.bat
 #cache:
 #- .\externals\cpython
 #- .\externals\aes

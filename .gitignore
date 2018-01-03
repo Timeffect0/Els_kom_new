@@ -1,15 +1,5 @@
-*.pyc
-*.chm
 obj
 bin
 old
-aes
 .vs
-_base64
 externals
-secure-file
-PC/encryption_private.h
-Tools/private_encryption.py
-
-# encrypted scripts.
-*.pye
