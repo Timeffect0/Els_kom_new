@@ -5,6 +5,32 @@ namespace Els_kom_Core.Classes
     /// </summary>
     public class Unpacker
     {
+        private static System.Collections.Generic.Dictionary<int, int> KeyMap { get; set; } = new System.Collections.Generic.Dictionary<int, int>();
+
+        /// <summary>
+        /// Makes KOM V2 Entries for unpacking.
+        /// </summary>
+        private static System.Tuple<System.Collections.Generic.List<EntryVer2>, int> Make_entries_v2(int size, System.IO.BinaryReader reader)
+        {
+            System.Collections.Generic.List<EntryVer2> entries = new System.Collections.Generic.List<EntryVer2>();
+            int relative_offseterr = size;
+            for (int i = 0; i < size; i++)
+            {
+                string key = string.Empty;
+                int originalsize;
+                ReadInFile(reader, out originalsize);
+                int compressedSize;
+                ReadInFile(reader, out compressedSize);
+                int offset;
+                ReadInFile(reader, out offset);
+                //SubFiles.Add(GetSafeString(key), new KOMSubFile(this, reader, 0x3C + size * 0x48));
+                var entry = new EntryVer2(GetSafeString(key), originalsize, compressedSize, offset);
+                entries.Add(entry);
+                relative_offseterr += offset;
+            }
+            return System.Tuple.Create(entries, relative_offseterr);
+        }
+
         /// <summary>
         /// Makes KOM V3 Entries for unpacking.
         /// </summary>
@@ -35,50 +61,47 @@ namespace Els_kom_Core.Classes
         }
 
         /// <summary>
-        /// Unpacks V4 KOM Files.
-        /// Note: V4 is V3 but with a encrypted CRC XML Data.
+        /// Decrypt XML Header data in KOM V4 for KOM V3 Entry maker works out of the box.
         /// </summary>
-        public static void Kom_v4_unpack(string in_path, string out_path)
+        private static void DecryptCRCXml(int key, ref byte[] data, int length, System.Text.Encoding encoding)
         {
-            // not implemented yet due to lack of information on v4 koms.
+            if (!KeyMap.ContainsKey(key))
+                return;
+
+            string keyStr = KeyMap[key].ToString();
+            string sha1Key = System.BitConverter.ToString(new System.Security.Cryptography.SHA1CryptoServiceProvider().ComputeHash(encoding.GetBytes(keyStr))).Replace("-", "");
+
+            BlowFish blowfish = new BlowFish(sha1Key);
+            data = blowfish.Decrypt(data, System.Security.Cryptography.CipherMode.ECB);
         }
 
         /// <summary>
-        /// Unpacks V3 KOM Files.
+        /// Common Unpack Code for KOM V3 and KOM V4.
         /// </summary>
-        public static void Kom_v3_unpack(string in_path, string out_path)
+        private static void Kom_v3_v4_unpack(string in_path, string out_path, int version)
         {
-            // not fully implemented yet due to crash in the actual testing code.
-            /*
-            if you dont understand why we dont do the header check here,
-            the check is actually in the KOM Manager that invokes these packers / unpackers anyway.
-            and would be redundant to have here as well so they are left out.
-            */
-            int offset = 0;
             System.IO.BinaryReader reader = new System.IO.BinaryReader(System.IO.File.OpenRead(in_path), System.Text.Encoding.ASCII);
             byte[] entry_count_buffer = new byte[System.Convert.ToInt32(KOM_DATA.KOM_ENTRY_COUNT_SIZE)];
-            offset += 52;
             reader.BaseStream.Position += 52;
             entry_count_buffer = reader.ReadBytes(System.Convert.ToInt32(KOM_DATA.KOM_ENTRY_COUNT_SIZE));
+            int compressed = 0;
+            if (version > 3)
+            {
+                // do some reading for the CRC XML Data decompression or something?
+            }
             int entry_count = System.BitConverter.ToInt32(entry_count_buffer, 0);
-            //MessageManager.ShowInfo(entry_count.ToString(), "Debug!");
-            offset += 12;
             byte[] file_timer_buffer = new byte[System.Convert.ToInt32(KOM_DATA.KOM_FILE_TIMER_SIZE)];
             reader.BaseStream.Position += 4;
             file_timer_buffer = reader.ReadBytes(System.Convert.ToInt32(KOM_DATA.KOM_FILE_TIMER_SIZE));
-            //MessageManager.ShowInfo(System.BitConverter.ToInt32(file_timer_buffer, 0).ToString(), "Debug!");
             byte[] xml_size_file_buffer = new byte[System.Convert.ToInt32(KOM_DATA.KOM_XML_SIZE_FILE_SIZE)];
-            offset += 4;
             xml_size_file_buffer = reader.ReadBytes(System.Convert.ToInt32(KOM_DATA.KOM_XML_SIZE_FILE_SIZE));
-            //MessageManager.ShowInfo(System.BitConverter.ToInt32(xml_size_file_buffer, 0).ToString(), "Debug!");
-            offset += 4;
             byte[] xmldatabuffer = new byte[System.BitConverter.ToInt32(xml_size_file_buffer, 0)];
             xmldatabuffer = reader.ReadBytes(System.BitConverter.ToInt32(xml_size_file_buffer, 0));
-            string xmldata = System.Text.Encoding.UTF8.GetString(xmldatabuffer);
-            //System.IO.StreamWriter debugfile = System.IO.File.CreateText(System.Windows.Forms.Application.StartupPath + "\\debug.log");
-            //debugfile.Write(xmldata);
-            //debugfile.Close();
-            //debugfile.Dispose();
+            if (version > 3)
+            {
+                DecryptCRCXml(compressed, ref xmldatabuffer, System.BitConverter.ToInt32(xml_size_file_buffer, 0), System.Text.Encoding.ASCII);
+            }
+            string xmldata = System.Text.Encoding.ASCII.GetString(xmldatabuffer);
             System.Tuple<System.Collections.Generic.List<EntryVer3>, int> entries = Make_entries_v3(xmldata, entry_count);
             foreach (var entry in entries.Item1)
             {
@@ -87,8 +110,8 @@ namespace Els_kom_Core.Classes
                 {
                     System.IO.Directory.CreateDirectory(out_path);
                 }
-                System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
                 byte[] entrydata = reader.ReadBytes(entry.compressed_size);
+                byte[] dec_entrydata;
                 //entry.uncompressed_size
                 //entry.compressed_size
                 //entry.checksum
@@ -96,28 +119,59 @@ namespace Els_kom_Core.Classes
                 //entry.file_time
                 if (entry.algorithm == 0)
                 {
-                    // TODO: Use Embeded Zlib stuff.
-                    entryfile.Write(entrydata, 0, entry.compressed_size);
+                    System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
+                    ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.compressed_size);
+                    entryfile.Write(dec_entrydata, 0, entry.uncompressed_size);
+                    entryfile.Close();
+                    entryfile.Dispose();
                 }
-                else if (entry.algorithm == 2)
+                else
                 {
-                    // algorithm 3 code.
-
+                    if (entry.algorithm == 3)
+                    {
+                        // algorithm 3 code.
+                        // this possible where plugin algorithm 3 unpack support be called?
+                    }
+                    else
+                    {
+                        // algorithm 2 code.
+                        // this possible where plugin algorithm 2 unpack support be called?
+                    }
+                    System.IO.FileStream entryfile;
+                    if (entrydata.Length == entry.uncompressed_size)
+                    {
+                        entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
+                    }
+                    else
+                    {
+                        // data was not decompressed properly so lets just dump it as is.
+                        entryfile = System.IO.File.Create(out_path + "\\" + entry.name + "." + entry.uncompressed_size + "." + entry.algorithm);
+                    }
                     // for now until I can decompress this crap.
                     entryfile.Write(entrydata, 0, entry.compressed_size);
+                    entryfile.Close();
+                    entryfile.Dispose();
                 }
-                else if (entry.algorithm == 3)
-                {
-                    // algorithm 3 code.
-
-                    // for now until I can decompress this crap.
-                    entryfile.Write(entrydata, 0, entry.compressed_size);
-                }
-                entryfile.Close();
-                entryfile.Dispose();
             }
             reader.Close();
             reader.Dispose();
+        }
+
+        /// <summary>
+        /// Unpacks V4 KOM Files.
+        /// Note: V4 is V3 but with a encrypted CRC XML Data.
+        /// </summary>
+        public static void Kom_v4_unpack(string in_path, string out_path)
+        {
+            Kom_v3_v4_unpack(in_path, out_path, 4);
+        }
+
+        /// <summary>
+        /// Unpacks V3 KOM Files.
+        /// </summary>
+        public static void Kom_v3_unpack(string in_path, string out_path)
+        {
+            Kom_v3_v4_unpack(in_path, out_path, 3);
         }
 
         /// <summary>
@@ -125,7 +179,57 @@ namespace Els_kom_Core.Classes
         /// </summary>
         public static void Kom_v2_unpack(string in_path, string out_path)
         {
-            // not implemented yet due to lack of information on v4 koms.
+
+            System.IO.BinaryReader reader = new System.IO.BinaryReader(System.IO.File.OpenRead(in_path), System.Text.Encoding.ASCII);
+            reader.BaseStream.Position = 56;
+            int size;
+            ReadInFile(reader, out size);
+            System.Tuple<System.Collections.Generic.List<EntryVer2>, int> entries = Make_entries_v2(0x3C + size * 0x48, reader);
+            foreach (var entry in entries.Item1)
+            {
+                // iterate through every item in KOM V2.
+                MessageManager.ShowInfo(entry.name, "Debug!");
+                MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
+                MessageManager.ShowInfo(entry.compressed_size.ToString(), "Debug!");
+                MessageManager.ShowInfo(entry.relative_offset.ToString(), "Debug!");
+            }
+            reader.Close();
+            reader.Dispose();
+        }
+
+        private static string GetSafeString(string source)
+        {
+            if (source.Contains(new string(char.MinValue, 1)))
+                return source.Substring(0, source.IndexOf(char.MinValue));
+
+            return source;
+        }
+
+        internal static bool ReadInFile(System.IO.BinaryReader binaryReader, out string destString, int length, System.Text.Encoding encoding)
+        {
+            long position = binaryReader.BaseStream.Position;
+            byte[] readBytes = binaryReader.ReadBytes(length);
+            if ((binaryReader.BaseStream.Position - position) == length)
+            {
+                destString = encoding.GetString(readBytes);
+                return true;
+            }
+            destString = null;
+            return false;
+        }
+
+        internal static bool ReadInFile(System.IO.BinaryReader binaryReader, out int destInt)
+        {
+            long position = binaryReader.BaseStream.Position;
+            int readInt = binaryReader.ReadInt32();
+            if ((binaryReader.BaseStream.Position - position) == sizeof(int))
+            {
+                destInt = readInt;
+
+                return true;
+            }
+            destInt = int.MinValue;
+            return false;
         }
     }
 }

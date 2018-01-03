@@ -1,7 +1,7 @@
 namespace Els_kom_Core.Classes
 {
     /// <summary>
-    /// Class for V3 KOM support.
+    /// Class for V2 KOM support.
     /// </summary>
     public class EntryVer2
     {

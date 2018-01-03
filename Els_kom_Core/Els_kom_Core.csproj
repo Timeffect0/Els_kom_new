@@ -93,6 +93,7 @@
     <Compile Include="Classes\ShowTaskbarEvent.cs" />
     <Compile Include="Classes\Unpacker.cs" />
     <Compile Include="Classes\Version.cs" />
+    <Compile Include="Classes\ZlibHelper.cs" />
     <Compile Include="Classes\Zlib\Adler32.cs" />
     <Compile Include="Classes\Zlib\Deflate.cs" />
     <Compile Include="Classes\Zlib\InfBlocks.cs" />
