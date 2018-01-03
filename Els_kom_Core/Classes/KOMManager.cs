@@ -88,7 +88,7 @@ namespace Els_kom_Core.Classes
         private static int GetHeaderVersion(string komfile)
         {
             int ret = 0;
-            System.IO.FileStream reader = new System.IO.FileStream(System.Windows.Forms.Application.StartupPath + "\\koms\\" + komfile, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+            System.IO.BinaryReader reader = new System.IO.BinaryReader(System.IO.File.OpenRead(System.Windows.Forms.Application.StartupPath + "\\koms\\" + komfile), System.Text.Encoding.ASCII);
             byte[] headerbuffer = new byte[System.Convert.ToInt32(KOM_DATA.KOM_HEADER_SIZE)];
             // 27 is the size of the header string denoting the KOM file version number.
             int offset = 0;
@@ -167,18 +167,27 @@ namespace Els_kom_Core.Classes
             {
                 string _kom_file = fi.Name;
                 int kom_ver = GetHeaderVersion(_kom_file);
-                if (kom_ver != 0 && kom_ver != 4)
+                if (kom_ver != 0)
                 {
                     // remove ".kom" on end of string.
                     string _kom_data_folder = System.IO.Path.GetFileNameWithoutExtension(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file);
-                    ExecutionManager.Shell(System.Windows.Forms.Application.StartupPath + "\\komextract_new.exe", "--version " + kom_ver + " --in \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file + "\" --out \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\"", false, false, false, true, System.Diagnostics.ProcessWindowStyle.Hidden, System.Windows.Forms.Application.StartupPath, true);
-                    fi.Delete();
+                    if (kom_ver == 2)
+                    {
+                        Unpacker.Kom_v2_unpack(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file, System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder);
+                    }
+                    else if (kom_ver == 3)
+                    {
+                        Unpacker.Kom_v3_unpack(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file, System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder);
+                    }
+                    else if (kom_ver == 4)
+                    {
+                        Unpacker.Kom_v4_unpack(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file, System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder);
+                        //MessageManager.ShowError("KOM V4 is currently not supported yet. Please wait until it is.", "Error!");
+                    }
+                    //ExecutionManager.Shell(System.Windows.Forms.Application.StartupPath + "\\komextract_new.exe", "--version " + kom_ver + " --in \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file + "\" --out \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\"", false, false, false, true, System.Diagnostics.ProcessWindowStyle.Hidden, System.Windows.Forms.Application.StartupPath, true);
+                    //fi.Delete();
                     // make the version dummy file for the packer.
                     System.IO.File.Create(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\\KOMVERSION." + kom_ver);
-                }
-                else if (kom_ver == 4)
-                {
-                    MessageManager.ShowError("KOM V4 is currently not supported yet. Please wait until it is.", "Error!");
                 }
                 else
                 {

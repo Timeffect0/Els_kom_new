@@ -62,6 +62,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -87,12 +88,25 @@
     <Compile Include="Classes\KOMManager.cs" />
     <Compile Include="Classes\KOMV2.cs" />
     <Compile Include="Classes\KOMV3.cs" />
-    <Compile Include="Classes\KOMV4.cs" />
     <Compile Include="Classes\MessageManager.cs" />
     <Compile Include="Classes\Packer.cs" />
     <Compile Include="Classes\ShowTaskbarEvent.cs" />
     <Compile Include="Classes\Unpacker.cs" />
     <Compile Include="Classes\Version.cs" />
+    <Compile Include="Classes\Zlib\Adler32.cs" />
+    <Compile Include="Classes\Zlib\Deflate.cs" />
+    <Compile Include="Classes\Zlib\InfBlocks.cs" />
+    <Compile Include="Classes\Zlib\InfCodes.cs" />
+    <Compile Include="Classes\Zlib\Inflate.cs" />
+    <Compile Include="Classes\Zlib\InfTree.cs" />
+    <Compile Include="Classes\Zlib\StaticTree.cs" />
+    <Compile Include="Classes\Zlib\SupportClass.cs" />
+    <Compile Include="Classes\Zlib\Tree.cs" />
+    <Compile Include="Classes\Zlib\ZInputStream.cs" />
+    <Compile Include="Classes\Zlib\Zlib.cs" />
+    <Compile Include="Classes\Zlib\ZOutputStream.cs" />
+    <Compile Include="Classes\Zlib\ZStream.cs" />
+    <Compile Include="Classes\Zlib\ZStreamException.cs" />
     <Compile Include="Controls\AboutControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -132,6 +146,7 @@
       <DependentUpon>SettingsControl.cs</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
