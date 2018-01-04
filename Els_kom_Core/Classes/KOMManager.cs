@@ -187,7 +187,14 @@ namespace Els_kom_Core.Classes
                     //ExecutionManager.Shell(System.Windows.Forms.Application.StartupPath + "\\komextract_new.exe", "--version " + kom_ver + " --in \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_file + "\" --out \"" + System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\"", false, false, false, true, System.Diagnostics.ProcessWindowStyle.Hidden, System.Windows.Forms.Application.StartupPath, true);
                     //fi.Delete();
                     // make the version dummy file for the packer.
-                    System.IO.File.Create(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\\KOMVERSION." + kom_ver);
+                    try
+                    {
+                        System.IO.File.Create(System.Windows.Forms.Application.StartupPath + "\\koms\\" + _kom_data_folder + "\\KOMVERSION." + kom_ver);
+                    }
+                    catch (System.IO.DirectoryNotFoundException)
+                    {
+                        // cannot create this since nothing was written or made.
+                    }
                 }
                 else
                 {

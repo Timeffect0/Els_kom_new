@@ -10,13 +10,14 @@ namespace Els_kom_Core.Classes
         /// <summary>
         /// Makes KOM V2 Entries for unpacking.
         /// </summary>
-        private static System.Tuple<System.Collections.Generic.List<EntryVer2>, int> Make_entries_v2(int size, System.IO.BinaryReader reader)
+        private static System.Collections.Generic.List<EntryVer2> Make_entries_v2(int size, System.IO.BinaryReader reader)
         {
             System.Collections.Generic.List<EntryVer2> entries = new System.Collections.Generic.List<EntryVer2>();
-            int relative_offseterr = size;
+            //int relative_offseterr = size;
             for (int i = 0; i < size; i++)
             {
-                string key = string.Empty;
+                string key;
+                ReadInFile(reader, out key, 60, System.Text.Encoding.ASCII);
                 int originalsize;
                 ReadInFile(reader, out originalsize);
                 int compressedSize;
@@ -26,18 +27,17 @@ namespace Els_kom_Core.Classes
                 //SubFiles.Add(GetSafeString(key), new KOMSubFile(this, reader, 0x3C + size * 0x48));
                 var entry = new EntryVer2(GetSafeString(key), originalsize, compressedSize, offset);
                 entries.Add(entry);
-                relative_offseterr += offset;
+                //relative_offseterr += offset;
             }
-            return System.Tuple.Create(entries, relative_offseterr);
+            return entries;
         }
 
         /// <summary>
         /// Makes KOM V3 Entries for unpacking.
         /// </summary>
-        private static System.Tuple<System.Collections.Generic.List<EntryVer3>, int> Make_entries_v3(string xmldata, int entry_count)
+        private static System.Collections.Generic.List<EntryVer3> Make_entries_v3(string xmldata, int entry_count)
         {
             System.Collections.Generic.List<EntryVer3> entries = new System.Collections.Generic.List<EntryVer3>();
-            int relative_offseterr = 0;
             var xml = System.Xml.Linq.XElement.Parse(xmldata);
             foreach (var fileElement in xml.Elements("File"))
             {
@@ -53,11 +53,10 @@ namespace Els_kom_Core.Classes
                 var FileTime = FileTimeAttribute == null ? -1 : int.Parse(FileTimeAttribute.Value, System.Globalization.NumberStyles.HexNumber);
                 var AlgorithmAttribute = fileElement.Attribute("Algorithm");
                 var Algorithm = AlgorithmAttribute == null ? -1 : System.Convert.ToInt32(AlgorithmAttribute.Value);
-                var entry = new EntryVer3(name, size, CompressedSize, Checksum, relative_offseterr, FileTime, Algorithm);
+                var entry = new EntryVer3(name, size, CompressedSize, Checksum, FileTime, Algorithm);
                 entries.Add(entry);
-                relative_offseterr += entry.compressed_size;
             }
-            return System.Tuple.Create(entries, relative_offseterr);
+            return entries;
         }
 
         /// <summary>
@@ -102,8 +101,8 @@ namespace Els_kom_Core.Classes
                 DecryptCRCXml(compressed, ref xmldatabuffer, System.BitConverter.ToInt32(xml_size_file_buffer, 0), System.Text.Encoding.ASCII);
             }
             string xmldata = System.Text.Encoding.ASCII.GetString(xmldatabuffer);
-            System.Tuple<System.Collections.Generic.List<EntryVer3>, int> entries = Make_entries_v3(xmldata, entry_count);
-            foreach (var entry in entries.Item1)
+            System.Collections.Generic.List<EntryVer3> entries = Make_entries_v3(xmldata, entry_count);
+            foreach (var entry in entries)
             {
                 // we iterate through every entry here and unpack the data.
                 if (!System.IO.Directory.Exists(out_path))
@@ -115,12 +114,12 @@ namespace Els_kom_Core.Classes
                 //entry.uncompressed_size
                 //entry.compressed_size
                 //entry.checksum
-                //entry.relative_offset
                 //entry.file_time
                 if (entry.algorithm == 0)
                 {
                     System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
-                    ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.compressed_size);
+                    MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
+                    ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.uncompressed_size);
                     entryfile.Write(dec_entrydata, 0, entry.uncompressed_size);
                     entryfile.Close();
                     entryfile.Dispose();
@@ -184,14 +183,17 @@ namespace Els_kom_Core.Classes
             reader.BaseStream.Position = 56;
             int size;
             ReadInFile(reader, out size);
-            System.Tuple<System.Collections.Generic.List<EntryVer2>, int> entries = Make_entries_v2(0x3C + size * 0x48, reader);
-            foreach (var entry in entries.Item1)
+            //System.Collections.Generic.List<EntryVer2> entries = Make_entries_v2(0x3C + size * 0x48, reader);
+            // 0x3C + size and 0x3C + size * 0x48 seems to both overflow the actual entry count?
+            // Need a better way for getting the entry count here.
+            System.Collections.Generic.List<EntryVer2> entries = Make_entries_v2(0x3C + size, reader);
+            foreach (var entry in entries)
             {
                 // iterate through every item in KOM V2.
-                MessageManager.ShowInfo(entry.name, "Debug!");
-                MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
-                MessageManager.ShowInfo(entry.compressed_size.ToString(), "Debug!");
-                MessageManager.ShowInfo(entry.relative_offset.ToString(), "Debug!");
+                MessageManager.ShowInfo("Entry File Name: " + entry.name, "Debug!");
+                MessageManager.ShowInfo("Entry File Original Size: " + entry.uncompressed_size.ToString(), "Debug!");
+                MessageManager.ShowInfo("Entry File Compressed Size Size: " + entry.compressed_size.ToString(), "Debug!");
+                //MessageManager.ShowInfo(entry.relative_offset.ToString(), "Debug!");
             }
             reader.Close();
             reader.Dispose();
