@@ -1,4 +1,4 @@
-﻿using System.Resources;
+using System.Resources;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Els_kom Core DLL")]
 [assembly: AssemblyDescription("A Core DLL for Els_kom that moves all Modules / Common Code to 1 DLL.")]
-[assembly: AssemblyCompany("AraHaan")]
+[assembly: AssemblyCompany("Els_kom org.")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright © 2014-2017")]
+[assembly: AssemblyCopyright("Copyright © 2014-2018")]
 
 [assembly: AssemblyTrademark("")]
 

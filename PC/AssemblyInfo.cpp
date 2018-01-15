@@ -12,9 +12,9 @@ using namespace System::Resources;
 [assembly:AssemblyTitleAttribute(L"Els_kom")];
 [assembly:AssemblyDescriptionAttribute(L"")];
 [assembly:AssemblyConfigurationAttribute(L"")];
-[assembly:AssemblyCompanyAttribute(L"AraHaan")];
+[assembly:AssemblyCompanyAttribute(L"Els_kom org.")];
 [assembly:AssemblyProductAttribute(L"")];
-[assembly:AssemblyCopyrightAttribute(L"Copyright © 2014-2017")];
+[assembly:AssemblyCopyrightAttribute(L"Copyright ï¿½ 2014-2018")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 
