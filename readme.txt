@@ -8,7 +8,9 @@
 		KOM version the file requires. This is so the GUI can
 		properly pack and unpack and all KOM versions.
 	+ Updated copyright info.
-	+ Move Python kom code to the C# core.
+	+ Removed Python kom file format packing and unpacking code
+		(The C# core does it all now).
+	+ Renamed PCbuild.sln to pcbuild.sln.
 
 =============================================================================
                              Els_kom v1.4.9.7
