@@ -1,0 +1,1 @@
+Added way of detecting of Python 2.7.1 and the Scypts for koms are installed in "C:\Python27" (if they arent there then the program would close without crashing with a error that ppl would not know what files are missing).
