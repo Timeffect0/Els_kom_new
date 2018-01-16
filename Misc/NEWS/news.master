@@ -1,5 +1,14 @@
-projname = Els_kom
+# global news or changelog configurations.
+projname = "Els_kom"
+genfilename = "../../bin/x86/Release/news.txt"
+# tab or spaces for entries in generated section chunks.
+tabs = true
+deletechunkentryfiles = false
 
+# imports for all the sections for the generated output.
+# all proceesed files after section gneration would be
+# deleted and replaced with an single file if deletion after
+# generating the section chunk is enabled.
 import "1.4.9.8"
 import "1.4.9.7"
 import "1.4.9.6"
