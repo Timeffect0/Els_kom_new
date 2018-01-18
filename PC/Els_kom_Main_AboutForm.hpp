@@ -53,7 +53,7 @@ namespace Els_kom {
         this->aboutControl1->Name = L"aboutControl1";
         this->aboutControl1->Size = System::Drawing::Size(382, 220);
         this->aboutControl1->TabIndex = 13;
-        this->aboutControl1->CloseForm += gcnew System::EventHandler(this, &AboutForm::aboutControl1_CloseForm);
+        this->aboutControl1->ParentForm = this;
         // 
         // AboutForm
         // 
@@ -86,7 +86,6 @@ namespace Els_kom {
 #pragma endregion
     private: System::Void AboutForm_Load(System::Object^  sender, System::EventArgs^  e);
     private: System::Void AboutForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e);
-    private: System::Void aboutControl1_CloseForm(System::Object^  sender, System::EventArgs^  e);
     };
   }
 }

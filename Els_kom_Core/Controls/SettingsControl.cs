@@ -1,4 +1,4 @@
-﻿namespace Els_kom_Core.Controls
+namespace Els_kom_Core.Controls
 {
     /// <summary>
     /// SettingsControl control for Els_kom's Settings form.
@@ -17,9 +17,9 @@
         string curvalue2;
         string curvalue3;
         /// <summary>
-        /// Event that the control fires that Closes the Form it is on.
+        /// Parrent Form that the control is on.
         /// </summary>
-        public event System.EventHandler CloseForm;
+        public System.Windows.Forms.Form ParentForm;
 
         /// <summary>
         /// Saves the Settings that changed in this Control's buffers.
@@ -70,7 +70,7 @@
 
         void Button2_Click(object sender, System.EventArgs e)
         {
-            CloseForm?.Invoke(this, new System.EventArgs());
+            this.ParentForm.Close();
         }
 
         void Timer1_Tick(object sender, System.EventArgs e)

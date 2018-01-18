@@ -41,7 +41,7 @@ namespace Els_kom {
         this->settingsControl1->Name = L"settingsControl1";
         this->settingsControl1->Size = System::Drawing::Size(510, 104);
         this->settingsControl1->TabIndex = 10;
-        this->settingsControl1->CloseForm += gcnew System::EventHandler(this, &SettingsForm::settingsControl1_CloseForm);
+        this->settingsControl1->ParentForm = this;
         // 
         // SettingsForm
         // 
@@ -63,7 +63,6 @@ namespace Els_kom {
 #pragma endregion
     private: System::Void SettingsForm_Load(System::Object^  sender, System::EventArgs^  e);
     private: System::Void SettingsForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e);
-    private: System::Void settingsControl1_CloseForm(System::Object^  sender, System::EventArgs^  e);
     };
   }
 }

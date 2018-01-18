@@ -29,9 +29,5 @@ namespace Els_kom {
     System::Void SettingsForm::SettingsForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
       this->settingsControl1->SaveSettings();
     }
-
-    System::Void SettingsForm::settingsControl1_CloseForm(System::Object^  sender, System::EventArgs^  e) {
-      this->Close();
-    }
   }
 }

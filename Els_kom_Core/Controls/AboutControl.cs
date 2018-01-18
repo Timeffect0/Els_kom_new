@@ -1,4 +1,4 @@
-﻿namespace Els_kom_Core.Controls
+namespace Els_kom_Core.Controls
 {
     /// <summary>
     /// AboutControl control for Els_kom's About form.
@@ -33,9 +33,9 @@
         }
 
         /// <summary>
-        /// Event that the control fires that Closes the Form it is on.
+        /// Parrent Form that the control is on.
         /// </summary>
-        public event System.EventHandler CloseForm;
+        public System.Windows.Forms.Form ParentForm;
 
         [System.Runtime.InteropServices.DllImport("shell32.dll")]
         static extern System.IntPtr ShellExecute(System.IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, ShowCommands nShowCmd);
@@ -72,7 +72,7 @@
 
         void cmdOK_Click(object sender, System.EventArgs e)
         {
-            CloseForm?.Invoke(this, new System.EventArgs());
+            this.ParentForm.Close();
         }
 
         private void AboutControl_Paint(object sender, System.Windows.Forms.PaintEventArgs e)

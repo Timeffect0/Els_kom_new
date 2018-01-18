@@ -33,9 +33,5 @@ namespace Els_kom {
     System::Void AboutForm::AboutForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
       this->Label1->Text = "0";
     }
-
-    System::Void AboutForm::aboutControl1_CloseForm(System::Object^  sender, System::EventArgs^  e) {
-      this->Close();
-    }
   }
 }
