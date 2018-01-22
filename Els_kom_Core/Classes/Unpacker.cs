@@ -110,19 +110,20 @@ namespace Els_kom_Core.Classes
                     System.IO.Directory.CreateDirectory(out_path);
                 }
                 byte[] entrydata = reader.ReadBytes(entry.compressed_size);
-                byte[] dec_entrydata;
                 //entry.uncompressed_size
                 //entry.compressed_size
                 //entry.checksum
                 //entry.file_time
                 if (entry.algorithm == 0)
                 {
-                    System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
+                    System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name + ".comp");
                     MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
-                    ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.uncompressed_size);
-                    entryfile.Write(dec_entrydata, 0, entry.uncompressed_size);
+                    //ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.uncompressed_size);
+                    entryfile.Write(entrydata, 0, entry.compressed_size);
                     entryfile.Close();
                     entryfile.Dispose();
+                    ZlibHelper.decompressFile(out_path + "\\" + entry.name + ".comp", out_path + "\\" + entry.name + ".comp");
+                    System.IO.File.Delete(out_path + "\\" + entry.name + ".comp");
                 }
                 else
                 {
