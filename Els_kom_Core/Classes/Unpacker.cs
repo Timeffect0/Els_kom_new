@@ -116,26 +116,36 @@ namespace Els_kom_Core.Classes
                 //entry.file_time
                 if (entry.algorithm == 0)
                 {
-                    System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name + ".comp");
-                    MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
-                    //ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.uncompressed_size);
-                    entryfile.Write(entrydata, 0, entry.compressed_size);
+                    byte[] dec_entrydata;
+                    //System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name + ".comp");
+                    System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
+                    //MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
+                    ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.compressed_size);
+                    try
+                    {
+                        entryfile.Write(dec_entrydata, 0, entry.uncompressed_size);
+                    }
+                    catch (System.ArgumentException)
+                    {
+                        // decompression failed just dump file as is.
+                        //entryfile.Write(entrydata, 0, entry.compressed_size);
+                    }
                     entryfile.Close();
                     entryfile.Dispose();
-                    ZlibHelper.decompressFile(out_path + "\\" + entry.name + ".comp", out_path + "\\" + entry.name + ".comp");
-                    System.IO.File.Delete(out_path + "\\" + entry.name + ".comp");
+                    //ZlibHelper.DecompressFile(out_path + "\\" + entry.name + ".comp", out_path + "\\" + entry.name);
+                    //System.IO.File.Delete(out_path + "\\" + entry.name + ".comp");
                 }
                 else
                 {
                     if (entry.algorithm == 3)
                     {
                         // algorithm 3 code.
-                        // this possible where plugin algorithm 3 unpack support be called?
+                        // this possibly where plugin algorithm 3 unpack support be called?
                     }
                     else
                     {
                         // algorithm 2 code.
-                        // this possible where plugin algorithm 2 unpack support be called?
+                        // this possibly where plugin algorithm 2 unpack support be called?
                     }
                     System.IO.FileStream entryfile;
                     if (entrydata.Length == entry.uncompressed_size)

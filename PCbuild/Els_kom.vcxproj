@@ -56,7 +56,7 @@
       <FixedBaseAddress>true</FixedBaseAddress>
     </Link>
     <PostBuildEvent>
-      <Command>echo F|xcopy /Y /c $(SolutionDir)\..\readme.txt $(OutDir)readme.txt</Command>
+      <Command>echo F|xcopy /Y /c "$(SolutionDir)..\readme.txt" "$(OutDir)readme.txt"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
