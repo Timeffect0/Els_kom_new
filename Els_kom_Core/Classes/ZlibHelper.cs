@@ -44,25 +44,25 @@ namespace Els_kom_Core.Classes
 
         private static void CopyStream(System.IO.Stream input, System.IO.Stream output, int size)
         {
-            input.CopyTo(output, size);
-            //byte[] buffer = new byte[2000];
-            //int len;
-            //while ((len = input.Read(buffer, 0, 2000)) > 0)
-            //{
-            //    if (len == size)
-            //    {
-            //        MessageManager.ShowInfo("Size and len are the same.", "Debug!");
-            //    }
-            //    try
-            //    {
-            //        // this oddly causes and overflow exception.
-            //        output.Write(buffer, 0, len);
-            //    }
-            //    catch (System.OverflowException)
-            //    {
-            //        //MessageManager.ShowError("The decompression resulted in an data overflow.", "Error!");
-            //    }
-            //}
+            //input.CopyTo(output, size);
+            byte[] buffer = new byte[2000];
+            int len;
+            while ((len = input.Read(buffer, 0, 2000)) > 0)
+            {
+                if (len == size)
+                {
+                    MessageManager.ShowInfo("Size and len are the same.", "Debug!");
+                }
+                try
+                {
+                    // this oddly causes and overflow exception.
+                    output.Write(buffer, 0, len);
+                }
+                catch (System.OverflowException)
+                {
+                    //MessageManager.ShowError("The decompression resulted in an data overflow.", "Error!");
+                }
+            }
             output.Flush();
         }
 

@@ -116,10 +116,9 @@ namespace Els_kom_Core.Classes
                 //entry.file_time
                 if (entry.algorithm == 0)
                 {
+                    bool failure = false;
                     byte[] dec_entrydata;
-                    //System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name + ".comp");
                     System.IO.FileStream entryfile = System.IO.File.Create(out_path + "\\" + entry.name);
-                    //MessageManager.ShowInfo(entry.uncompressed_size.ToString(), "Debug!");
                     ZlibHelper.DecompressData(entrydata, out dec_entrydata, entry.compressed_size);
                     try
                     {
@@ -128,12 +127,18 @@ namespace Els_kom_Core.Classes
                     catch (System.ArgumentException)
                     {
                         // decompression failed just dump file as is.
-                        //entryfile.Write(entrydata, 0, entry.compressed_size);
+                        if (!failure)
+                        {
+                            failure = true;
+                        }
+                        entryfile.Write(entrydata, 0, entry.compressed_size);
                     }
                     entryfile.Close();
                     entryfile.Dispose();
-                    //ZlibHelper.DecompressFile(out_path + "\\" + entry.name + ".comp", out_path + "\\" + entry.name);
-                    //System.IO.File.Delete(out_path + "\\" + entry.name + ".comp");
+                    if (failure)
+                    {
+                        System.IO.File.Move(out_path + "\\" + entry.name, out_path + "\\" + entry.name + "." + entry.uncompressed_size + "." + entry.algorithm);
+                    }
                 }
                 else
                 {
