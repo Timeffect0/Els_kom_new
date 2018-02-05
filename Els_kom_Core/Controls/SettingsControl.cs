@@ -19,7 +19,7 @@ namespace Els_kom_Core.Controls
         /// <summary>
         /// Parrent Form that the control is on.
         /// </summary>
-        public System.Windows.Forms.Form ParentForm;
+        public new System.Windows.Forms.Form ParentForm;
 
         /// <summary>
         /// Saves the Settings that changed in this Control's buffers.

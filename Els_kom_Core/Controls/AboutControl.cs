@@ -35,7 +35,7 @@ namespace Els_kom_Core.Controls
         /// <summary>
         /// Parrent Form that the control is on.
         /// </summary>
-        public System.Windows.Forms.Form ParentForm;
+        public new System.Windows.Forms.Form ParentForm;
 
         [System.Runtime.InteropServices.DllImport("shell32.dll")]
         static extern System.IntPtr ShellExecute(System.IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, ShowCommands nShowCmd);
